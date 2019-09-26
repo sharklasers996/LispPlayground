@@ -17,10 +17,19 @@
          (index (search search-string input :start2 start-from))
          (next-index (when index
                        (1+ index))))
-    (print "vals")
-    (print index)
-    (print next-index)
     (when next-index
       (push index indices)
       (setf indices (append indices (find-indices search-string input next-index))))
     indices))
+
+(defun find-index-pairs (search-string input)
+  (let* ((result (list))
+        (indices (find-indices search-string input)))
+    (labels ((take-two (lst)
+               (when (<= 2 (length lst))
+                 (push (list (first lst) (second lst)) result)
+                 (take-two (cddr lst)))))
+      (when (not (evenp (length indices)))
+        (error "Index count is not even"))
+      (take-two indices))
+    (reverse result)))
