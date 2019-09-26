@@ -1,0 +1,28 @@
+digraph {
+	graph [bb="-188.09,-78.482,186.93,82.194"];
+	node [label="\N"];
+	LIVING_ROOM	 [height=0.5,
+		label="(LIVING-ROOM (YOU ARE IN TH...",
+		pos="-6.642,-3.7117",
+		width=4.2788];
+	GARDEN	 [height=0.5,
+		label="(GARDEN (YOU ARE IN A BEAUT...",
+		pos="-31.451,64.194",
+		width=4.351];
+	LIVING_ROOM -> GARDEN	 [label="(WEST DOOR)",
+		lp="-70.599,32.9",
+		pos="e,-31.012,45.918 -19.952,14.519 -22.97,21.21 -25.908,28.938 -28.245,36.28"];
+	ATTIC	 [height=0.5,
+		label="(ATTIC (YOU ARE IN THE ATTI...",
+		pos="38.093,-60.482",
+		width=4.1344];
+	LIVING_ROOM -> ATTIC	 [label="(UPSTAIRS LADDER)",
+		lp="88.766,-35.314",
+		pos="e,31.28,-42.161 15.967,-21.738 19.264,-25.611 22.553,-29.775 25.566,-33.89"];
+	GARDEN -> LIVING_ROOM	 [label="(EAST DOOR)",
+		lp="30.505,27.583",
+		pos="e,-7.0811,14.564 -18.142,45.963 -15.124,39.272 -12.186,31.544 -9.848,24.202"];
+	ATTIC -> LIVING_ROOM	 [label="(DOWNSTAIRS LADDER)",
+		lp="-70.315,-28.88",
+		pos="e,0.17182,-22.033 15.484,-42.457 12.187,-38.583 8.8987,-34.419 5.8854,-30.304"];
+}
