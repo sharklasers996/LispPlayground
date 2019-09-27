@@ -95,6 +95,14 @@
              (not (eq 'text-node (type-of node))))
     (string= "a" (tag-name node))))
 
+(defun tag= (node tag-string)
+  "Returns T if tag-string equals nodes tag-name, or if tag-string equals *"
+  (when (and (not (eq 'root (type-of node)))
+             (not (eq 'text-node (type-of node))))
+    (if (string= "*" tag-string)
+      T
+      (string= tag-string (tag-name node)))))
+
 (defun attribute-contains-value (node attribute value)
   (let ((attribute-value (attribute node attribute)))
     (when attribute-value
