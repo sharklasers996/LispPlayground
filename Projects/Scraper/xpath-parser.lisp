@@ -1,4 +1,13 @@
-(defparameter *test-xpath* "//table[@class='desraite/desra/']//div[@id='/opa/opa']/a/img")
+(defparameter *test-xpath* "/html/div/a")
+(defparameter *xpath-tokens* nil)
+
+(defun set-xpath (xpath)
+  (setf *test-xpath* xpath)
+  (set-xpath-tokens))
+
+(defun set-xpath-tokens ()
+  (setf *xpath-tokens* nil)
+  (dolist (x (split-xpath *test-xpath*)) (push (parse-xpath-token x) *xpath-tokens*)))
 
 (defun count-occurrences (search-string input)
   "Counts search-string occurrences in input"
@@ -55,7 +64,8 @@
 
 (defun split-xpath (xpath)
   "Splits xpath into a list of single element tokens"
-  (let* ((slash-indices (find-indices "/" xpath))
+  (let* ((result (list))
+        (slash-indices (find-indices "/" xpath))
         (quote-index-pairs (find-index-pairs "'" xpath))
         (not-ignored-slash-indices (remove-intersecting-indices slash-indices quote-index-pairs))
         (non-neighboring-indices (remove-neighboring-indices not-ignored-slash-indices))
@@ -66,6 +76,21 @@
       (when (< 0 (length non-neighboring-indices))
         (setf next-index (first non-neighboring-indices)))
       (if next-index
-          (print (subseq xpath current-index next-index))
-          (print (subseq xpath current-index)))
-      (setf next-index nil))))
+          (push (subseq xpath current-index next-index) result)
+          (push (subseq xpath current-index) result))
+      (setf next-index nil))
+    result))
+
+(defun parse-xpath-token (xpath-token)
+  (let* ((properties-index (search "[" xpath-token))
+        (unparsed-tag-string (if properties-index
+                                 (subseq xpath-token 0 properties-index)
+                                 xpath-token))
+         (tag-name-index (1+ (search "/" unparsed-tag-string :from-end t)))
+         (token (list :tag-name (subseq unparsed-tag-string tag-name-index)
+                      :first-child (if (= tag-name-index 1)
+                                       t
+                                       nil)
+                      :properties (if properties-index
+                                      (subseq xpath-token properties-index)))))
+    token))
