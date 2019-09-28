@@ -132,7 +132,6 @@
          (token (first xpath-tokens))
          (has-more-tokens (< 1 (length xpath-tokens))))
     (when (should-be-first-child-p token)
-      (format t "~a ~a~%" node  (getf token :tag-name))
       (setf temp-result (find-first-child-nodes node (getf token :tag-name)))
       (if has-more-tokens
           (dolist (n temp-result)

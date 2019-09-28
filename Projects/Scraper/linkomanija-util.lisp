@@ -17,8 +17,8 @@
     (dex:get url  :cookie-jar cookie-jar)))
 
 
-(defvar *tv-show-page-source* (get-tv-show-page 0 *cookie-jar*))
-(defvar *tv-show-page* (plump:parse *tv-show-page-source*))
+(defparameter *tv-show-page-source* (get-tv-show-page 0 *cookie-jar*))
+(defparameter *tv-show-page* (plump:parse *tv-show-page-source*))
 
 (defmacro query-tv-show-page (query &rest actions)
   `(lquery:$ *tv-show-page* ,query ,@actions))
