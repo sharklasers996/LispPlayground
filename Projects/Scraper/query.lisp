@@ -1,12 +1,12 @@
 (ql:quickload :plump)
 
-(defpackage :query-test
-  (:use :common-lisp)
-  (:use :plump-dom)
-  (:shadow :element))
+;; (defpackage :query-test
+;;   (:use :common-lisp)
+;;   (:use :plump-dom)
+;;   (:shadow :element))
 
 (use-package :plump-dom)
-(in-package :query-test)
+;; (in-package :query-test)
 
 (defvar *page* (plump:parse "<html><a href=\"url.html\">Desraites</a> </html>"))
 
@@ -95,13 +95,59 @@
              (not (eq 'text-node (type-of node))))
     (string= "a" (tag-name node))))
 
+(defun find-nodes (node tag-string)
+  (let ((tags))
+    (labels ((proc-node (node)
+               (when node
+                 (when (tag= node tag-string)
+                   (push node tags))
+                 (when (has-child-nodes node)
+                   (loop for n across (children node)
+                         do (proc-node n))))))
+      (proc-node node))
+    tags))
+
+(defun find-first-child-nodes (node tag-string)
+  (let ((nodes))
+    (when (has-child-nodes node)
+      (loop for n across (children node)
+            do (if (tag= n tag-string)
+                   (push n nodes))))
+    nodes))
+
 (defun tag= (node tag-string)
   "Returns T if tag-string equals nodes tag-name, or if tag-string equals *"
   (when (and (not (eq 'root (type-of node)))
+             (not (eq 'doctype (type-of node)))
+             (not (eq 'comment (type-of node)))
              (not (eq 'text-node (type-of node))))
     (if (string= "*" tag-string)
       T
       (string= tag-string (tag-name node)))))
+
+
+(defun find-nodes-by-xpath (node xpath-tokens)
+  (let* ((result (list))
+         (temp-result nil)
+         (token (first xpath-tokens))
+         (has-more-tokens (< 1 (length xpath-tokens))))
+    (when (should-be-first-child-p token)
+      (format t "~a ~a~%" node  (getf token :tag-name))
+      (setf temp-result (find-first-child-nodes node (getf token :tag-name)))
+      (if has-more-tokens
+          (dolist (n temp-result)
+            (setf result (append result (find-nodes-by-xpath n (rest xpath-tokens)))))
+          (setf result (append result temp-result))))
+    (when (not (should-be-first-child-p token))
+      (setf temp-result (find-nodes node (getf token :tag-name)))
+      (if has-more-tokens
+          (dolist (n temp-result)
+            (setf result (append result (find-nodes-by-xpath n (rest xpath-tokens)))))
+          (setf result (append result temp-result))))
+    result))
+
+(defun should-be-first-child-p (token)
+  (eq (getf token :first-child) t))
 
 (defun attribute-contains-value (node attribute value)
   (let ((attribute-value (attribute node attribute)))
